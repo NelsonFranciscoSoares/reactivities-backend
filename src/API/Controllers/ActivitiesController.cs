@@ -22,7 +22,20 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateActivity([FromBody]Activity activity)
         {
-            return Ok(await this.Mediator.Send(new Create.Command{ Activity = activity}));
+            return Ok(await this.Mediator.Send(new Create.Command{ Activity = activity }));
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> EditActivity([FromRoute]Guid id, [FromBody]Activity activity)
+        {
+            activity.Id = id;
+            return Ok(await this.Mediator.Send(new Edit.Command{ Activity = activity }));
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteActivity([FromRoute]Guid id)
+        {
+            return Ok(await this.Mediator.Send(new Delete.Command{ Id = id }));
         }
     }
 }
