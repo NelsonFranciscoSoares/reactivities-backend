@@ -1,14 +1,16 @@
+using System.Diagnostics;
+using Application.Core;
 using MediatR;
 using Persistence;
 
 public class Delete 
 {
-    public class Command: IRequest
+    public class Command: IRequest<Result<Unit>>
     {
         public Guid Id { get; set; }
     }
 
-    public class Handler : IRequestHandler<Command>
+    public class Handler : IRequestHandler<Command, Result<Unit>>
     {
         private readonly DataContext _dataContext;
         public Handler(DataContext dataContext)
@@ -16,13 +18,19 @@ public class Delete
             this._dataContext = dataContext;
         }
 
-        public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
             var activity = await this._dataContext.Activities.FindAsync(request.Id);
-            this._dataContext.Remove(activity);
-            await this._dataContext.SaveChangesAsync();
 
-            return Unit.Value;
+            // if (activity == null) return null;
+
+            this._dataContext.Remove(activity);
+
+            var result = await this._dataContext.SaveChangesAsync() > 0;
+
+            if (!result) Result<Unit>.Failure("Failed to remove activity");
+
+            return Result<Unit>.Success(Unit.Value);
         }
     }
 }
