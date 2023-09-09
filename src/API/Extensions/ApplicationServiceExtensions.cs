@@ -12,6 +12,8 @@ namespace API.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddRouting(options => options.LowercaseUrls = true);
+            
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
             services.AddDbContext<DataContext>(opt => {
