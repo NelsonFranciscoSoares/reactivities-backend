@@ -37,7 +37,7 @@ namespace API.Controllers
             return new UserDto {
                 AccessToken = this._tokenService.CreateToken(user),
                 DisplayName = user.DisplayName,
-                Image = "Image",
+                Image = null,
                 Username = user.UserName
             };
         }
@@ -48,12 +48,14 @@ namespace API.Controllers
         {
             if (await this._userManager.Users.AnyAsync(user => user.UserName == registerUserDto.Username))
             {
-                return BadRequest("Username is already taken");
+                ModelState.AddModelError("username", "Username is already taken");
+                return ValidationProblem();
             }
 
             if (await this._userManager.Users.AnyAsync(user => user.Email == registerUserDto.Email))
             {
-                return BadRequest("Email is already taken");
+                ModelState.AddModelError("email", "Email is already taken");
+                return ValidationProblem();
             }
 
             var appUser = new AppUser {
